@@ -24,6 +24,11 @@ class TaskService
     {
         return DB::transaction(function () use ($request, $id) {
             $task = auth()->user()->tasks()->find($id);
+            
+            if (!$task) {
+                return null;
+            }
+            
             $task->fill($request->all());
             $task->save();
 
@@ -35,6 +40,11 @@ class TaskService
     {
         return DB::transaction(function () use ($id) {
             $task = Task::find($id);
+            
+            if (!$task) {
+                return response()->json(['error' => 'Task not found'], 404);
+            }
+            
             $task->delete();
 
             return response()->noContent();
@@ -51,6 +61,11 @@ class TaskService
     public function getTask(Request $request, string $id)
     {
         $task = Task::find($id);
+        
+        if (!$task) {
+            return response()->json(['error' => 'Task not found'], 404);
+        }
+        
         return new TaskResource($task);
     }
 }
