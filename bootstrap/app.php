@@ -19,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Apply it globally, but only for API routes using `group`
         $middleware->group('api', [
+            \Illuminate\Http\Middleware\HandleCors::class,
             'api.checkIfAcceptJson',
         ]);
     })
