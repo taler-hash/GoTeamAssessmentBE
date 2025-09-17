@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\TaskController;
 
 Route::get('/', function () {
     return response()->json([
@@ -20,6 +21,11 @@ Route::prefix('auth')
         Route::get('/me', 'me');
         Route::post('/logout', 'logout');
     });
+});
+
+//Authenticated Routes
+Route::middleware('auth:sanctum')->group(function () {
+    Route::apiResource('tasks', TaskController::class);
 });
 
 Route::get('/user', function (Request $request) {
