@@ -14,6 +14,13 @@ class Task extends Model
     protected $fillable = [
         'user_id',
         'description',
+        'completed',
+        'date',
+    ];
+
+    protected $casts = [
+        'completed' => 'boolean',
+        'date' => 'date',
     ];
 
     public function user()

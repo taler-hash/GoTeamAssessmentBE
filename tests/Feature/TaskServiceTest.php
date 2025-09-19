@@ -5,6 +5,8 @@ namespace Tests\Feature;
 use App\Models\User;
 use App\Models\Task;
 use App\Services\TaskService;
+use App\Http\Requests\AddTaskRequest;
+use App\Http\Requests\UpdateTaskRequest;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\Request;
@@ -35,7 +37,8 @@ class TaskServiceTest extends TestCase
         Auth::login($user);
 
         // Create a mock request
-        $request = Request::create('/tasks', 'POST', [
+        $request = AddTaskRequest::create('/tasks', 'POST', [
+            'date' => '2021-01-01',
             'description' => 'Test task description'
         ]);
 
@@ -49,6 +52,7 @@ class TaskServiceTest extends TestCase
         // Check if task was created in database
         $this->assertDatabaseHas('tasks', [
             'user_id' => $user->id,
+            'date' => '2021-01-01',
             'description' => 'Test task description'
         ]);
     }
@@ -61,6 +65,7 @@ class TaskServiceTest extends TestCase
         // Create a task owned by the user
         $task = Task::factory()->create([
             'user_id' => $user->id,
+            'date' => '2021-01-01',
             'description' => self::ORIGINAL_DESCRIPTION
         ]);
         
@@ -68,8 +73,10 @@ class TaskServiceTest extends TestCase
         Auth::login($user);
 
         // Create a mock request
-        $request = Request::create("/tasks/{$task->id}", 'PUT', [
-            'description' => self::UPDATED_DESCRIPTION
+        $request = UpdateTaskRequest::create("/tasks/{$task->id}", 'PUT', [
+            'date' => '2021-01-01',
+            'description' => self::UPDATED_DESCRIPTION,
+            'completed' => false
         ]);
 
         // Execute the method
@@ -83,6 +90,7 @@ class TaskServiceTest extends TestCase
         $this->assertDatabaseHas('tasks', [
             'id' => $task->id,
             'user_id' => $user->id,
+            'date' => '2021-01-01',
             'description' => self::UPDATED_DESCRIPTION
         ]);
     }
@@ -96,6 +104,7 @@ class TaskServiceTest extends TestCase
         // Create a task owned by user1
         $task = Task::factory()->create([
             'user_id' => $user1->id,
+            'date' => '2021-01-01',
             'description' => self::ORIGINAL_DESCRIPTION
         ]);
         
@@ -103,8 +112,10 @@ class TaskServiceTest extends TestCase
         Auth::login($user2);
 
         // Create a mock request
-        $request = Request::create("/tasks/{$task->id}", 'PUT', [
-            'description' => self::UPDATED_DESCRIPTION
+        $request = UpdateTaskRequest::create("/tasks/{$task->id}", 'PUT', [
+            'date' => '2021-01-01',
+            'description' => self::UPDATED_DESCRIPTION,
+            'completed' => false
         ]);
 
         // Execute the method - should return null since task is not owned by user2
@@ -116,6 +127,7 @@ class TaskServiceTest extends TestCase
         // Check that task was not updated
         $this->assertDatabaseHas('tasks', [
             'id' => $task->id,
+            'date' => '2021-01-01',
             'description' => self::ORIGINAL_DESCRIPTION
         ]);
     }
@@ -128,6 +140,7 @@ class TaskServiceTest extends TestCase
         // Create a task
         $task = Task::factory()->create([
             'user_id' => $user->id,
+            'date' => '2021-01-01',
             'description' => 'Task to be deleted'
         ]);
 
@@ -164,12 +177,14 @@ class TaskServiceTest extends TestCase
         
         // Create multiple tasks for the user
         Task::factory()->count(5)->create([
-            'user_id' => $user->id
+            'user_id' => $user->id,
+            'date' => '2021-01-01',
         ]);
         
         // Create tasks for another user (should not be included)
         Task::factory()->count(3)->create([
-            'user_id' => User::factory()->create()->id
+            'user_id' => User::factory()->create()->id,
+            'date' => '2021-01-01',
         ]);
         
         // Authenticate the user
@@ -197,6 +212,7 @@ class TaskServiceTest extends TestCase
         // Create a task
         $task = Task::factory()->create([
             'user_id' => $user->id,
+            'date' => '2021-01-01',
             'description' => 'Test task'
         ]);
 

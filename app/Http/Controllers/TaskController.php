@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Task;
 use App\Http\Resources\TaskResource;
 use App\Services\TaskService;
+use App\Http\Requests\AddTaskRequest;
+use App\Http\Requests\UpdateTaskRequest;
 
 class TaskController extends Controller
 {
@@ -26,7 +28,7 @@ class TaskController extends Controller
         return $this->taskService->getTask($request, $id);
     }
 
-    public function store(Request $request)
+    public function store(AddTaskRequest $request)
     {
         return response()->json([
             'message' => 'Task created successfully',
@@ -34,7 +36,7 @@ class TaskController extends Controller
         ]);
     }
 
-    public function update(Request $request, string $id)
+    public function update(UpdateTaskRequest $request, string $id)
     {
         return response()->json([
             'message' => 'Task updated successfully',

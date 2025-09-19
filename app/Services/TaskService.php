@@ -6,13 +6,16 @@ use App\Models\Task;
 use App\Http\Resources\TaskResource;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use App\Http\Requests\AddTaskRequest;
+use App\Http\Requests\UpdateTaskRequest;
 
 class TaskService
 {
-    public function createTask(Request $request)
+    public function createTask(AddTaskRequest $request)
     {
         return DB::transaction(function () use ($request) {
-            $task =(new Task())->fill($request->all());
+            $task = (new Task())->fill($request->all());
             $task->user_id = auth()->user()->id;
             $task->save();
 
@@ -20,15 +23,15 @@ class TaskService
         });
     }
 
-    public function updateTask(Request $request, string $id)
+    public function updateTask(UpdateTaskRequest $request, string $id)
     {
         return DB::transaction(function () use ($request, $id) {
             $task = auth()->user()->tasks()->find($id);
-            
+
             if (!$task) {
                 return null;
             }
-            
+
             $task->fill($request->all());
             $task->save();
 
@@ -40,11 +43,11 @@ class TaskService
     {
         return DB::transaction(function () use ($id) {
             $task = Task::find($id);
-            
+
             if (!$task) {
                 return response()->json(['error' => 'Task not found'], 404);
             }
-            
+
             $task->delete();
 
             return response()->noContent();
@@ -53,7 +56,15 @@ class TaskService
 
     public function getTasks(Request $request)
     {
-       $tasks = (new Task())->owned()->paginate(10);
+        $tasks = Task::query()
+            ->when($request->search, function ($query, $search) {
+                return $query->where('description', 'like', '%' . $search . '%');
+            })
+            ->when($request->date, function ($query, $date) {
+                return $query->whereDate('date', $date);
+            })
+            ->where('user_id', auth()->id())
+            ->paginate(20);
 
         return TaskResource::collection($tasks);
     }
@@ -61,11 +72,11 @@ class TaskService
     public function getTask(Request $request, string $id)
     {
         $task = Task::find($id);
-        
+
         if (!$task) {
             return response()->json(['error' => 'Task not found'], 404);
         }
-        
+
         return new TaskResource($task);
     }
 }
