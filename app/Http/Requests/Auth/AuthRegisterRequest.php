@@ -23,7 +23,7 @@ class AuthRegisterRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'unique:users,name'],
-            'username' => ['required', 'string', 'unique:users,username'],
+            'email' => ['required', 'string', 'unique:users,email'],
             'password' => ['required', 'string'],
         ];
     }
