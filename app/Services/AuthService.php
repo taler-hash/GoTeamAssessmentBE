@@ -12,9 +12,9 @@ class AuthService
 {
   public function authLogin(Request $request)
   {
-    $credentials = $request->only('username', 'password');
-    $username = $credentials['username'] ?? '';
-    $throttleKey = 'login_attempts:' . $username . '|' . $request->ip();
+    $credentials = $request->only('email', 'password');
+    $email = $credentials['email'] ?? '';
+    $throttleKey = 'login_attempts:' . $email . '|' . $request->ip();
 
     $maxAttempts = 5;
     $decayMinutes = 1;
@@ -31,7 +31,7 @@ class AuthService
 
     cache()->forget($throttleKey);
 
-    $user = User::where('username', $username)->first();
+    $user = User::where('email', $email)->first();
 
     return (object)[
       'user' => $user,
