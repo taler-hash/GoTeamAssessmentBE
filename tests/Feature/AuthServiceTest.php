@@ -27,13 +27,13 @@ class AuthServiceTest extends TestCase
         // Create a test user
         $user = User::factory()->create([
             'name' => 'Test User',
-            'username' => 'testuser',
+            'email' => 'testuser',
             'password' => Hash::make('password123')
         ]);
 
         // Create a mock request
         $request = Request::create('/login', 'POST', [
-            'username' => 'testuser',
+            'email' => 'testuser',
             'password' => 'password123'
         ]);
 
@@ -46,20 +46,20 @@ class AuthServiceTest extends TestCase
         $this->assertObjectHasProperty('token', $result);
         $this->assertInstanceOf(User::class, $result->user);
         $this->assertIsString($result->token);
-        $this->assertEquals('testuser', $result->user->username);
+        $this->assertEquals('testuser', $result->user->email);
     }
 
     public function test_auth_login_invalid_credentials(): void
     {
         // Create a test user
         User::factory()->create([
-            'username' => 'testuser',
+            'email' => 'testuser',
             'password' => Hash::make('password123')
         ]);
 
         // Create a mock request with invalid credentials
         $request = Request::create('/login', 'POST', [
-            'username' => 'testuser',
+            'email' => 'testuser',
             'password' => 'wrongpassword'
         ]);
 
@@ -75,7 +75,7 @@ class AuthServiceTest extends TestCase
         // Create a mock request
         $request = Request::create('/register', 'POST', [
             'name' => 'Test User',
-            'username' => 'testuser',
+            'email' => 'testuser',
             'password' => 'password123'
         ]);
 
@@ -89,7 +89,7 @@ class AuthServiceTest extends TestCase
         $this->assertInstanceOf(User::class, $result->user);
         $this->assertIsString($result->token);
         $this->assertEquals('Test User', $result->user->name);
-        $this->assertEquals('testuser', $result->user->username);
+        $this->assertEquals('testuser', $result->user->email);
     }
 
     public function test_auth_logout(): void
